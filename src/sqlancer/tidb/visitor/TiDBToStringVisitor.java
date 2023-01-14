@@ -82,6 +82,14 @@ public class TiDBToStringVisitor extends ToStringVisitor<TiDBExpression> impleme
 
     @Override
     public void visit(TiDBFunctionCall call) {
+        if (call.getFunction() == TiDBFunctionCall.TiDBFunction.MemberOf) {
+            visit(call.getArgs().get(0));
+            sb.append(" ");
+            sb.append(call.getFunction());
+            sb.append(" ");
+            visit(call.getArgs().get(1));
+            return;
+        }
         sb.append(call.getFunction());
         sb.append("(");
         visit(call.getArgs());
@@ -165,6 +173,9 @@ public class TiDBToStringVisitor extends ToStringVisitor<TiDBExpression> impleme
         visit(cast.getExpr());
         sb.append(" AS ");
         sb.append(cast.getType());
+        if (cast.isArray()) {
+            sb.append(" ARRAY ");
+        }
         sb.append(")");
     }
 

@@ -1,5 +1,10 @@
 package sqlancer;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -194,6 +199,40 @@ public final class Randomly {
         }
     }
 
+    public JsonElement getJSON() {
+        if (getBooleanWithSmallProbability()) {
+            JsonObject obj = new JsonObject();
+            for (int i = 0; i < smallNumber(); i++) {
+                obj.add(getString(), getJSON());
+            }
+            return obj;
+        }
+        if (getBoolean()) {
+            JsonArray obj = new JsonArray();
+            boolean t = getBoolean();
+            for (int i = 0; i < smallNumber(); i++) {
+                if (smallBiasProbability()) {
+                    if (getBoolean()) {
+                        obj.add(getString());
+                    } else {
+                        obj.add(getInteger());
+                    }
+                }
+                if (t) {
+                    obj.add(getString());
+                } else {
+                    obj.add(getInteger());
+                }
+            }
+            return obj;
+        }
+
+        if (getBoolean()) {
+            return new JsonPrimitive(getString());
+        }
+        return new JsonPrimitive(getInteger());
+    }
+
     public enum StringGenerationStrategy {
 
         NUMERIC {
@@ -204,7 +243,6 @@ public final class Randomly {
 
         },
         ALPHANUMERIC {
-
             @Override
             public String getString(Randomly r) {
                 return getStringOfAlphabet(r, ALPHANUMERIC_ALPHABET);
@@ -213,7 +251,6 @@ public final class Randomly {
 
         },
         ALPHANUMERIC_SPECIALCHAR {
-
             @Override
             public String getString(Randomly r) {
                 return getStringOfAlphabet(r, ALPHANUMERIC_SPECIALCHAR_ALPHABET);
@@ -253,7 +290,7 @@ public final class Randomly {
                     }
                 }
                 while (Randomly.getBooleanWithSmallProbability()) {
-                    String[][] pairs = { { "{", "}" }, { "[", "]" }, { "(", ")" } };
+                    String[][] pairs = {{"{", "}"}, {"[", "]"}, {"(", ")"}};
                     int idx = (int) Randomly.getNotCachedInteger(0, pairs.length);
                     int left = (int) Randomly.getNotCachedInteger(0, sb.length() + 1);
                     sb.insert(left, pairs[idx][0]);

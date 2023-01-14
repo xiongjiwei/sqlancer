@@ -118,6 +118,20 @@ public class TiDBFunctionCall implements TiDBExpression {
         IS_IPV6(1),
         // NAME_CONST(2),
 
+        MemberOf(2) {
+            @Override
+            public String toString() {
+                return "member of";
+            }
+        },
+        JSON_CONTAINS(2) {
+            @Override
+            public int getNrArgs() {
+                return Randomly.fromOptions(2, 3);
+            }
+        },
+        JSON_OVERLAPS(2),
+
         DATE_FORMAT(2), //
         // ANY_VALUE(1),
         DEFAULT(-1);

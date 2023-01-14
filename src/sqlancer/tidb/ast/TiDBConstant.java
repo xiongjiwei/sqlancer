@@ -1,5 +1,7 @@
 package sqlancer.tidb.ast;
 
+import com.google.gson.JsonElement;
+
 public class TiDBConstant implements TiDBExpression {
 
     private TiDBConstant() {
@@ -114,6 +116,26 @@ public class TiDBConstant implements TiDBExpression {
 
     }
 
+    public static class TiDBJSONConstant extends TiDBConstant {
+
+        private final JsonElement value;
+
+        public TiDBJSONConstant(JsonElement value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            String js = value.toString();
+            return "'" + js + "'";
+        }
+
+        public JsonElement getValue() {
+            return value;
+        }
+
+    }
+
     public static TiDBTextConstant createStringConstant(String text) {
         return new TiDBTextConstant(text);
     }
@@ -134,4 +156,7 @@ public class TiDBConstant implements TiDBExpression {
         return new TiDBBooleanConstant(val);
     }
 
+    public static TiDBExpression createJSONConstant(JsonElement json) {
+        return new TiDBJSONConstant(json);
+    }
 }

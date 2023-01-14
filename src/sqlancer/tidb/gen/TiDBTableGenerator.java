@@ -118,6 +118,7 @@ public class TiDBTableGenerator {
             sb.append(")");
             // TODO: do nto include blob/text columns here
             errors.add(" used in key specification without a key length");
+            errors.add(" cannot be used in key specification");
         }
         sb.append(")");
         if (Randomly.getBooleanWithRatherLowProbability()) {

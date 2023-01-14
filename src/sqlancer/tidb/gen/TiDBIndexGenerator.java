@@ -1,15 +1,17 @@
 package sqlancer.tidb.gen;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import sqlancer.IgnoreMeException;
 import sqlancer.Randomly;
 import sqlancer.common.query.ExpectedErrors;
 import sqlancer.common.query.SQLQueryAdapter;
+import sqlancer.tidb.TiDBExpressionGenerator;
 import sqlancer.tidb.TiDBProvider.TiDBGlobalState;
 import sqlancer.tidb.TiDBSchema.TiDBColumn;
 import sqlancer.tidb.TiDBSchema.TiDBTable;
+import sqlancer.tidb.visitor.TiDBVisitor;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public final class TiDBIndexGenerator {
 
@@ -42,12 +44,21 @@ public final class TiDBIndexGenerator {
             if (i != 0) {
                 sb.append(", ");
             }
-            sb.append(subset.get(i).getName());
-            if (!randomTable.isView()) {
-                // TODO: otherwise: Incorrect prefix key; the used key part isn't a string, the
-                // used length is longer than the key part, or the storage engine doesn't
-                // support unique prefix keys
-                TiDBTableGenerator.appendSpecifiers(sb, subset.get(i).getType().getPrimitiveDataType());
+            if (Randomly.getBoolean()) {
+                // a normal column.
+                sb.append(subset.get(i).getName());
+                if (!randomTable.isView()) {
+                    // TODO: otherwise: Incorrect prefix key; the used key part isn't a string, the
+                    // used length is longer than the key part, or the storage engine doesn't
+                    // support unique prefix keys
+                    TiDBTableGenerator.appendSpecifiers(sb, subset.get(i).getType().getPrimitiveDataType());
+                }
+            } else {
+                // a functional column.
+                sb.append("(");
+                TiDBExpressionGenerator gen = new TiDBExpressionGenerator(globalState).setColumns(List.of(subset.get(i)));
+                sb.append(TiDBVisitor.asString(gen.generateExpression()));
+                sb.append(")");
             }
             if (Randomly.getBoolean()) {
                 sb.append(" ");
@@ -61,6 +72,7 @@ public final class TiDBIndexGenerator {
         }
         errors.add("Cannot decode index value, because"); // invalid value for generated column
         errors.add("index already exist");
+        errors.add("supports indexing only via generated columns on a specified JSON path");
         return new SQLQueryAdapter(sb.toString(), errors, true);
     }
 

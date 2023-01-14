@@ -34,6 +34,10 @@ public final class TiDBErrors {
         errors.add("Empty pattern is invalid");
         errors.add("Invalid regexp pattern");
 
+        errors.add("cannot be used in key specification");
+        errors.add("Invalid JSON data provided to function");
+        errors.add("Expression index on a column is not supported. Consider using a regular index instead");
+
         // To avoid bugs
         errors.add("Unknown column"); // https://github.com/pingcap/tidb/issues/35522
         errors.add("Can\'t find column"); // https://github.com/pingcap/tidb/issues/35527
